@@ -2,7 +2,7 @@ import pandas as pd
 
 # ========== Extract ========== 
 
-data = pd.read_csv("./data/laptop_price_raw.csv",index_col="laptop_ID",encoding="latin1")
+data = pd.read_csv("./data/laptop_price_raw.csv",encoding="latin1")
 
 
 # ========== Transform ==========
@@ -50,10 +50,12 @@ data.rename(columns=rename_map, inplace=True)
 
 # Function to clean basic text fields
 def clean_text(s):
-    return s.str.strip().str.replace(r'\s+', ' ', regex=True)
+    return s.astype(str).str.strip().str.replace(r'\s+', ' ', regex=True)
 
 for col in ['company','product','device_type','screen_resolution','cpu','gpu','operating_system']:
     data[col] = clean_text(data[col])
+
+data['screen_size_in'] = pd.to_numeric(data['screen_size_in'], errors='coerce')
 
 data['ram_gb'] = (
     data['ram_gb']
@@ -84,6 +86,14 @@ data['weight_kg'] = (
         .astype(float)
 )
 
+data['price_euros'] = (
+    data['price_euros'].astype(str)
+      .str.replace(r'[^\d\.\,]', '', regex=True)
+      .str.replace(',', '', regex=False)
+      .str.strip()
+)
+data['price_euros'] = pd.to_numeric(data['price_euros'], errors='coerce')
+
 # Derive price in USD
 eur_to_usd = 1.08
 data['price_usd'] = (data['price_euros'] * eur_to_usd).round(2)
@@ -95,12 +105,10 @@ data[['screen_width','screen_height']] = (
       .astype('Int64')
 )
 
-# Drop duplicates, reindex, and check data after changes
-data.drop_duplicates(inplace=True)
+# Reindex and check data after changes
 data.reset_index(drop=True, inplace=True)
 print(data.head())
 print(data.describe())
 print(data.info())
-
 
 # ========== Load ==========
