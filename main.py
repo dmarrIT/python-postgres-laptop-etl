@@ -31,39 +31,86 @@ print("\nDuplicate values after dropping:")
 print(data.duplicated().sum())
 
 # Standardize
-data.rename(columns={'laptop_ID': 'laptop_id'}, inplace=True)
+rename_map = {
+    'laptop_ID': 'laptop_id',
+    'Company': 'company',
+    'Product': 'product',
+    'TypeName': 'device_type',
+    'Inches': 'screen_size_in',
+    'ScreenResolution': 'screen_resolution',
+    'Cpu': 'cpu',
+    'Ram': 'ram_gb',
+    'Memory': 'storage',
+    'Gpu': 'gpu',
+    'OpSys': 'operating_system',
+    'Weight': 'weight_kg',
+    'Price_euros': 'price_euros',
+}
+data.rename(columns=rename_map, inplace=True)
 
-data.rename(columns={'Company': 'company'}, inplace=True)
 data['company'] = (
     data['company']
         .str.strip()
         .str.replace(r'\s+', ' ', regex=True)
 )
 
-data.rename(columns={'Product': 'product'}, inplace=True)
 data['product'] = (
     data['product']
         .str.strip()
         .str.replace(r'\s+', ' ', regex=True)
 )
 
-data.rename(columns={'TypeName': 'device_type'}, inplace=True)
 data['device_type'] = (
     data['device_type']
         .str.strip()
         .str.replace(r'\s+', ' ', regex=True)
 )
 
-data.rename(columns={'Inches': 'screen_size_in'}, inplace=True)
-
-data.rename(columns={'ScreenResolution': 'screen_resolution'}, inplace=True)
 data['screen_resolution'] = (
     data['screen_resolution']
         .str.strip()
         .str.replace(r'\s+', ' ', regex=True)
 )
 
-data.rename(columns={'Weight':'weight_kg'}, inplace=True)
+data['cpu'] = (
+    data['cpu']
+        .str.strip()
+        .str.replace(r'\s+', ' ', regex=True)
+)
+
+data['ram_gb'] = (
+    data['ram_gb']
+        .str.lower()
+        .str.replace('gb', '', regex=False)
+        .str.strip()
+        .astype('Int64')
+)
+
+# split storage into two new fields: storage_gb and storage_type
+data['storage_gb'] = (
+    data['storage']
+        .str.extract(r'(\d+)\s*GB')
+        .astype('Int64')
+)
+
+data['storage_type'] = (
+    data['storage']
+        .str.replace(r'\d+\s*GB', '', regex=True)
+        .str.strip()
+)
+
+data['gpu'] = (
+    data['gpu']
+        .str.strip()
+        .str.replace(r'\s+', ' ', regex=True)
+)
+
+data['operating_system'] = (
+    data['operating_system']
+        .str.strip()
+        .str.replace(r'\s+', ' ', regex=True)
+)
+
 data['weight_kg'] = (
     data['weight_kg']
         .str.lower()
@@ -72,7 +119,9 @@ data['weight_kg'] = (
         .astype(float)
 )
 
-#TODO standardize everything after screen_resolution and before weight_kg
+# Derive price in USD
+eur_to_usd = 1.08
+data['price_usd'] = (data['price_euros'] * eur_to_usd).round(2)
 
 # Add parsed numeric columns for screen_width and screen_height from screen_resolution
 data[['screen_width','screen_height']] = (
@@ -81,10 +130,9 @@ data[['screen_width','screen_height']] = (
       .astype('Int64')
 )
 
-
-
 # Check data after changes
 print(data.head())
-
+print(data.describe())
+print(data.info())
 
 # ========== Load ==========
