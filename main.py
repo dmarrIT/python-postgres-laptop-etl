@@ -48,35 +48,12 @@ rename_map = {
 }
 data.rename(columns=rename_map, inplace=True)
 
-data['company'] = (
-    data['company']
-        .str.strip()
-        .str.replace(r'\s+', ' ', regex=True)
-)
+# Function to clean basic text fields
+def clean_text(s):
+    return s.str.strip().str.replace(r'\s+', ' ', regex=True)
 
-data['product'] = (
-    data['product']
-        .str.strip()
-        .str.replace(r'\s+', ' ', regex=True)
-)
-
-data['device_type'] = (
-    data['device_type']
-        .str.strip()
-        .str.replace(r'\s+', ' ', regex=True)
-)
-
-data['screen_resolution'] = (
-    data['screen_resolution']
-        .str.strip()
-        .str.replace(r'\s+', ' ', regex=True)
-)
-
-data['cpu'] = (
-    data['cpu']
-        .str.strip()
-        .str.replace(r'\s+', ' ', regex=True)
-)
+for col in ['company','product','device_type','screen_resolution','cpu','gpu','operating_system']:
+    data[col] = clean_text(data[col])
 
 data['ram_gb'] = (
     data['ram_gb']
@@ -99,18 +76,6 @@ data['storage_type'] = (
         .str.strip()
 )
 
-data['gpu'] = (
-    data['gpu']
-        .str.strip()
-        .str.replace(r'\s+', ' ', regex=True)
-)
-
-data['operating_system'] = (
-    data['operating_system']
-        .str.strip()
-        .str.replace(r'\s+', ' ', regex=True)
-)
-
 data['weight_kg'] = (
     data['weight_kg']
         .str.lower()
@@ -130,9 +95,12 @@ data[['screen_width','screen_height']] = (
       .astype('Int64')
 )
 
-# Check data after changes
+# Drop duplicates, reindex, and check data after changes
+data.drop_duplicates(inplace=True)
+data.reset_index(drop=True, inplace=True)
 print(data.head())
 print(data.describe())
 print(data.info())
+
 
 # ========== Load ==========
