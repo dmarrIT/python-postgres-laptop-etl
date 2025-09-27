@@ -1,0 +1,12 @@
+data:
+  raw_path: "data/raw/laptop_price_raw.csv"
+  processed_dir: "data/processed"
+  processed_filename: "laptops_cleaned.csv"
+
+currency:
+  eur_to_usd: 1.08
+
+db:
+  use_sqlite: true
+  sqlite_path: "db/laptops.db"
+  table_name: "laptops"

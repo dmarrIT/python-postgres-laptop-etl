@@ -1,5 +1,11 @@
-env/
-venv/
-data/
+# data & DB artifacts
+data/processed/
+db/*.db
+logs/
+
+# env / OS
 .env
-.venv/
+.DS_Store
+__pycache__/
+*.pyc
+.vscode/
