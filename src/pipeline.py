@@ -34,7 +34,7 @@ def main():
     out_name = cfg["data"]["processed_filename"]
     out_csv = to_csv(df_clean, out_dir, out_name)
 
-    # Load (SQLite) — optional via config
+    # Load (SQLite)
     if cfg.get("db", {}).get("use_sqlite", False):
         to_sqlite(
             df_clean,
